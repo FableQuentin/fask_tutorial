@@ -1,0 +1,10 @@
+<!-- This page inherit from the base template base.html -->
+ <!-- {{ placeholder }} is a placeholder for Jinja template engine, i.e a variable known at runtime -->
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Hi, {{ user.username }}!</h1>
+    {% for post in posts %}
+    <div><p>{{ post.author.username }} says: <b>{{ post.body }}</b></p></div>
+    {% endfor %}
+{% endblock %}

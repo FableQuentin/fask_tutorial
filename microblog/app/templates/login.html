@@ -1,0 +1,34 @@
+<!-- template for user login -->
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Sign in</h1>
+    <form action="" method="post" novalidate> 
+        <!-- HTM <form> element is used as a container for the web form -->
+        <!-- 'action' attribute is used to tell the browser the URM to usewhen submitting the info entered by the user (empty=form submitted to current URL) -->
+        <!-- 'method' attribute specifies HTTP request to use when submitting the form to the server (default is GET) -->
+        <!-- 'novalidate' indicates the web browser to leave the validation of the field to the running Flask application -->
+        
+        <!-- form.hidden_tag() is a template argument that generates a hidden fiel that includes a token used to protect the form against CSRF attacks -->
+        {{ form.hidden_tag() }}
+        
+        <!-- no HTML fields needed: fields from the form object knows how to render themselves as HTML -->
+        <p>
+            {{ form.username.label }}<br>
+            {{ form.username(size=32) }}<br>
+            {% for error in form.username.errors %} <!-- render errors messages added by the validators --> 
+            <span style="color: red;">[{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.pwd.label }}<br>
+            {{ form.pwd(size=32) }}<br>
+            {% for error in form.username.errors %}           
+            <span style="color: red;">[{{ error }}</span> 
+            {% endfor %} 
+        </p>
+        <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}
+

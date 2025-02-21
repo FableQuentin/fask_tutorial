@@ -1,9 +1,13 @@
 from flask import Flask
+from config import Config
 
 #__name__ is Python predefined variable which is set to the name of the module in which it is used
 # Flask uses the location of the module passed here as a starting point when it needs to load associated resources such as template files
 # The app variable is defined as an instance of class Flask in the __init__.py script, which makes it a member of the app package.
-app = Flask(__name__) 
+app = Flask(__name__)
+
+# Tell Flask to read the config file and apply it
+app.config.from_object(Config)
 
 
 # The bottom import is a well known workaround that avoids circular imports, a common problem with Flask applications. 

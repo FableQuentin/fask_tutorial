@@ -1,8 +1,10 @@
 from datetime import datetime, timezone
 from typing import Optional
+from werkzeug.security import generate_password_hash, check_password_hash
 import sqlalchemy as sqla # provides general purpose database functions and classes
 import sqlalchemy.orm as sqlo # provides support for using models
-from app import db
+from app import db, login
+from flask_login import UserMixin
 
 # Class to store users in the database
 # Inherits from db.Model, a base class for all Flask-SQLAlchemy models
@@ -13,7 +15,7 @@ from app import db
 # -> index:  indicate which fields are indexed (can be retrieved)
 # -> unique: indicate which fields are unique
 # -> Important so that database is consistent and searches are efficient
-class User(db.Model):
+class User(UserMixin, db.Model):
     id: sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
     username: sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(64), index=True, unique=True)
     email: sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(120), index=True, unique=True)
@@ -24,9 +26,24 @@ class User(db.Model):
     # This is not an actual database field, but a high-level view of the relationship between users and posts
     posts: sqlo.WriteOnlyMapped['Post'] = sqlo.relationship(back_populates='author')
 
+    # Password hashing
+    def set_password(self, pwd):
+        self.set_password_hash = generate_password_hash(pwd)
+
+    def chexk_password(self, pwd):
+        return check_password_hash(self.set_password_hash, pwd)
+
     # __repr__: method telling Python how to print objects of this class
     def __repr__(self):
         return '<User {}>'.format(self.username)
+
+# User loader function
+# As Flask-Login knows nothing about databases, it needs the application's help in loading a user. 
+# For that reason, the extension expects that the application will configure a user loader function, that can be called to load a user given the ID.
+# The ID is passed to the function by Flask-Login as a string (converted into integer as the database uses numeric IDs)
+@login.user_loader
+def load_user(id):
+    return db.session.get(User, int(id))
 
 # Class to store posts in the database
 class Post(db.Model):

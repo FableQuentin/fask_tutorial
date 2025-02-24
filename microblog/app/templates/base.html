@@ -20,7 +20,11 @@
             <!-- It avoids to search/replace links in the entire application if we change them -->
             <!-- The argument for url_for() is the 'endpoint' name, which is the name of the view function -->
             <a href="{{ url_for('index') }}">Home</a>
-            <a href="{{ url_for('login') }}">Login</a>            
+            {% if current_user.is_anonymous %} <!-- is_anonymous property is an attribute added by Flask-Login to user objects through UserMixin -->
+            <a href="{{ url_for('login') }}">Login</a>
+            {% else %}
+            <a href="{{ url_for('logout') }}">Login</a>            
+            {% endif %}
         </div>
         <hr>
         <!-- Get the list of messages registerd by flash() function -->

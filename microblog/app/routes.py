@@ -23,9 +23,6 @@ import sqlalchemy as sqla
 @app.route('/index')
 @login_required # redirection to the login page if the user try to access this view function
 def index():
-	# 'mock' object: we don't have user yet
-	user = {'username': 'Bob'}
-
 	# list of posts for my blog
 	posts = [
 		{
@@ -42,7 +39,7 @@ def index():
 	# It is done in Flask using the 'render_template(<filename.html>, <arg>)' function
 	# render_templates invokes Jinja template engine (bundled with Flask)
 	# Jinja substitutes {{ ... }} block with corresponding values provided in the <arg> of the function 
-	return render_template('index.html', title='Home', user=user, posts=posts)
+	return render_template('index.html', title='Home', posts=posts)
 
 # ========== LOG IN/OUT ===========
 #  - loading the page, the browser sends the GET request to receive the web page form
@@ -60,7 +57,9 @@ def login():
 	# db.session.scalar() will return the user object or None (db.session.scalar() method executes the database query helper function)
 	form = LoginForm()
 	if form.validate_on_submit():
-		user = db.session.scalar(sqla.select(User).where(User.name == form.username.data))
+		user = db.session.scalar(sqla.select(User).where(User.username == form.username.data))
+		print(user)
+		print(user.pwd_hash)
 
 		if user is None or not user.check_password(form.pwd.data):
 			flash('Invalid username or password')

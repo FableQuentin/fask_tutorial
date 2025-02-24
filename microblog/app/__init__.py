@@ -19,7 +19,7 @@ migrate = Migrate(app, db)
 
 # Flask-Login instance
 login = LoginManager(app)
-login.login_view = 'login' # define the default login 
+login.login_view = 'login' # define the default login view
 
 # The bottom import is a well known workaround that avoids circular imports, a common problem with Flask applications. 
 # routes module needs to import the app variable defined in this script, so putting one of the reciprocal imports at the bottom 

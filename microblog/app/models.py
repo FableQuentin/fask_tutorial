@@ -28,10 +28,10 @@ class User(UserMixin, db.Model):
 
     # Password hashing
     def set_password(self, pwd):
-        self.set_password_hash = generate_password_hash(pwd)
+        self.pwd_hash = generate_password_hash(pwd)
 
-    def chexk_password(self, pwd):
-        return check_password_hash(self.set_password_hash, pwd)
+    def check_password(self, pwd):
+        return check_password_hash(self.pwd_hash, pwd)
 
     # __repr__: method telling Python how to print objects of this class
     def __repr__(self):

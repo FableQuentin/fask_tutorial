@@ -58,8 +58,6 @@ def login():
 	form = LoginForm()
 	if form.validate_on_submit():
 		user = db.session.scalar(sqla.select(User).where(User.username == form.username.data))
-		print(user)
-		print(user.pwd_hash)
 
 		if user is None or not user.check_password(form.pwd.data):
 			flash('Invalid username or password')
@@ -105,4 +103,19 @@ def register():
 		flash('Congratulations, you are now a registered user!')
 		return redirect(url_for('login'))
 
-	return render_template('register.html', title="Register", form=form) 
+	return render_template('register.html', title="Register", form=form)
+
+# ========== USER PROFILE ===========
+@app.route('/user/<username>')
+@login_required
+def user(username):
+	# db.first_or_404() is a Flask-SQLAlchemy variant of db.session.scalar() that will automatically send a 404 error back to client if no results  
+	user = db.first_or_404(sqla.select(User).where(User.username == username))
+
+	# initialize a moke/fake list of posts
+	posts = [
+		{'author': user, 'body': 'Test post #1'},
+		{'author': user, 'body': 'Test post #2'}
+	]
+
+	return render_template('user.html', user=user, posts=posts)

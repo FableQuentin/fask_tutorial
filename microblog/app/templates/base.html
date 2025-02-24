@@ -1,0 +1,41 @@
+<!doctype html>
+<!-- Base template with navigation bar -->
+
+<html>
+    <head>
+        {% if title %}
+        <title>{{ title }} - Microblog</title>
+        {% else %}
+        <title>Welcome to Microblog</title>
+        {% endif %}
+    </head>
+    <body>
+        <div>
+            Microblog: 
+            <!-- <a href="/index">Home</a> -->
+            <!-- <a href="/login">Login</a> -->
+            
+            <!-- In stead of using direct links for URLs, we use the url_for() function from Flask -->
+            <!-- This function generates URLs using Flask internal mapping of URLs to view functions --> 
+            <!-- It avoids to search/replace links in the entire application if we change them -->
+            <!-- The argument for url_for() is the 'endpoint' name, which is the name of the view function -->
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('login') }}">Login</a>            
+        </div>
+        <hr>
+        <!-- Get the list of messages registerd by flash() function -->
+        <!-- This function can be used in to store a list of messages in Flask, they are then removed once requested -->
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li> {{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %} 
+        <!-- the 'block' control statement defines the place where derived templates can insert themselves -->
+        <!-- blocks are given a unique named, which derived templates can reference (here 'content')-->
+    </body>
+</html>

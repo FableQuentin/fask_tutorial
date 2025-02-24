@@ -41,6 +41,12 @@ class User(UserMixin, db.Model):
 # As Flask-Login knows nothing about databases, it needs the application's help in loading a user. 
 # For that reason, the extension expects that the application will configure a user loader function, that can be called to load a user given the ID.
 # The ID is passed to the function by Flask-Login as a string (converted into integer as the database uses numeric IDs)
+#
+# Note: 
+# - db.session is the database session manager, it allows you to interact with the database (transactions, queries and updates to your database)
+# - db.session.scalar(): use to fetch single a single scalar value (like id, email, etc...) to avoid unnecessary data 
+# - db.session.scalars(): use to fetch mutiple values
+# - db.select(): in SQLAlchemy 2.0, queries are constructed with db.select() (creates a SELECT statement)
 @login.user_loader
 def load_user(id):
     return db.session.get(User, int(id))

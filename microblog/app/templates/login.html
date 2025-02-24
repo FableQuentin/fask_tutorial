@@ -9,7 +9,7 @@
         <!-- 'method' attribute specifies HTTP request to use when submitting the form to the server (default is GET) -->
         <!-- 'novalidate' indicates the web browser to leave the validation of the field to the running Flask application -->
         
-        <!-- form.hidden_tag() is a template argument that generates a hidden fiel that includes a token used to protect the form against CSRF attacks -->
+        <!-- form.hidden_tag() is a template argument that generates a hidden field that includes a token used to protect the form against CSRF attacks -->
         {{ form.hidden_tag() }}
         
         <!-- no HTML fields needed: fields from the form object knows how to render themselves as HTML -->

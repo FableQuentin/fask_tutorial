@@ -5,6 +5,7 @@ import sqlalchemy as sqla # provides general purpose database functions and clas
 import sqlalchemy.orm as sqlo # provides support for using models
 from app import db, login
 from flask_login import UserMixin
+from hashlib import md5
 
 # Class to store users in the database
 # Inherits from db.Model, a base class for all Flask-SQLAlchemy models
@@ -19,7 +20,11 @@ class User(UserMixin, db.Model):
     id: sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
     username: sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(64), index=True, unique=True)
     email: sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(120), index=True, unique=True)
-    pwd_hash: sqlo.Mapped[Optional[str]] = sqlo.mapped_column(sqla.String(256))    
+    pwd_hash: sqlo.Mapped[Optional[str]] = sqlo.mapped_column(sqla.String(256))
+
+    # user info 
+    about_me: sqlo.Mapped[Optional[str]] = sqlo.mapped_column(sqla.String(140))
+    last_seen: sqlo.Mapped[Optional[datetime]] = sqlo.mapped_column(default=lambda: datetime.now(timezone.utc))
     
     # Users' posts field: references values from the id column in the users table
     # WriteOnlyMapped defines posts as a collection type with Post objects inside.
@@ -32,6 +37,11 @@ class User(UserMixin, db.Model):
 
     def check_password(self, pwd):
         return check_password_hash(self.pwd_hash, pwd)
+    
+    # User avatar URLs (for Gravatar)
+    def get_avatar_url(self, size):
+        digest = md5(self.email.lower().encode('utf-8')).hexdigest()
+        return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
 
     # __repr__: method telling Python how to print objects of this class
     def __repr__(self):

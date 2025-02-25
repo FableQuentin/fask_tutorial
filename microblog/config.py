@@ -16,3 +16,11 @@ class Config:
     # 'SQLALCHEMY_DATABASE_URI' is a configuration variable obtained from 'DATABASE_URL' environment variable
     # If not defined, we configure a database named app.db located in the main directory of the application  (stored in the basedir variable)
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'app.db')
+
+    # Email server configuration (for error handlers)
+    MAIL_SERVER = os.environ.get('MAIL_SERVER')
+    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 25) #default port is 25
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    ADMINS = ['quentin.fable@gmail.com'] #list of email addresses that will receive error reports

@@ -53,4 +53,9 @@ class EditProfileForm(FlaskForm):
             user = db.session.scalar(sqla.select(User).where(User.username == username.data))
 
             if user is not None:
-                raise ValidationError('Please use a different username.')    
+                raise ValidationError('Please use a different username.')
+
+
+# Empty form for following and unfollowing
+class EmptyForm(FlaskForm):
+    submit = SubmitField('Submit')

@@ -132,17 +132,23 @@ def user(username):
 	# db.first_or_404() is a Flask-SQLAlchemy variant of db.session.scalar() that will automatically send a 404 error back to client if no results  
 	user = db.first_or_404(sqla.select(User).where(User.username == username))
 
-	# initialize a moke/fake list of posts
-	# TO DO: show last posts
-	posts = [
-		{'author': user, 'body': 'Test post #1'},
-		{'author': user, 'body': 'Test post #2'}
-	]
+	# pagination for posts in user profile
+	user = db.first_or_404(sqla.select(User).where(User.username == username))
+	page = request.args.get('page', 1, type=int)
+	query = user.posts.select().order_by(Post.timestamp.desc())
+	posts = db.paginate(query, page=page, per_page=app.config['POSTS_PER_PAGE'], error_out=False)
+	
+	next_url = None
+	if posts.has_next:
+		next_url = url_for('user', username=user.username, page=posts.next_num)
+		
+	prev_url = None
+	if posts.has_prev:
+		prev_url = url_for('user', username=user.username, page=posts.prev_num)
 
 	# render the follow or unfollow button
-	form = EmptyForm()
-	
-	return render_template('user.html', user=user, posts=posts, form=form)
+	form = EmptyForm()	
+	return render_template('user.html', user=user, posts=posts, next_url=next_url, prev_url=prev_url, form=form)
 
 # Edit profile
 @app.route('/edit_profile', methods=['GET', 'POST'])

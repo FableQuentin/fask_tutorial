@@ -24,3 +24,6 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = ['quentin.fable@gmail.com'] #list of email addresses that will receive error reports
+
+    # Number of Posts per pagination
+    POSTS_PER_PAGE = 5

@@ -39,14 +39,26 @@ def index():
 		# This trick is called Post/Redirect/Get pattern
 		return redirect(url_for('index'))		
 	
-	# display list of followed posts
-	posts = db.session.scalars(current_user.following_posts()).all()
+	# display list of followed posts (with pagination)
+	# extract 'page' argument from URL query, default is '1'
+	page = request.args.get('page', 1, type=int)
+	# pagination: retrieve only the desired page of results
+	# the posts.items attribute contains the list of items retrieved for the selected page
+	posts = db.paginate(current_user.following_posts(), page=page, per_page=app.config['POSTS_PER_PAGE'], error_out=False)
+	# add link to next_page
+	next_url = None 
+	if posts.has_next:
+		next_url = url_for('index', page=posts.next_num)
+	# add link to previous page
+	prev_url = None
+	if posts.has_prev:
+		prev_url = url_for('index', page=posts.prev_num)
 
 	# The operation that converts a template into a HTML page is called 'rendering'
 	# It is done in Flask using the 'render_template(<filename.html>, <arg>)' function
 	# render_templates invokes Jinja template engine (bundled with Flask)
 	# Jinja substitutes {{ ... }} block with corresponding values provided in the <arg> of the function 
-	return render_template('index.html', title='Home', posts=posts, form=form)
+	return render_template('index.html', title='Home', form=form, posts=posts.items, next_url=next_url, prev_url=prev_url)
 
 # ========== LOG IN/OUT ===========
 #  - loading the page, the browser sends the GET request to receive the web page form
@@ -121,6 +133,7 @@ def user(username):
 	user = db.first_or_404(sqla.select(User).where(User.username == username))
 
 	# initialize a moke/fake list of posts
+	# TO DO: show last posts
 	posts = [
 		{'author': user, 'body': 'Test post #1'},
 		{'author': user, 'body': 'Test post #2'}
@@ -209,3 +222,22 @@ def unfollow(username):
 		return redirect(url_for('user', username=username))
 	else:
 		return redirect(url_for('index'))
+	
+# ========== EXPLORE PAGE ===========
+@app.route("/explore")
+@login_required
+def explore():
+	page = request.args.get('page', 1, type=int)
+	query = sqla.select(Post).order_by(Post.timestamp.desc())
+	posts = db.paginate(query, page=page, per_page=app.config['POSTS_PER_PAGE'], error_out=False)
+
+	# add link to next_page
+	next_url = None 
+	if posts.has_next:
+		next_url = url_for('explore', page=posts.next_num)
+	# add link to previous page
+	prev_url = None
+	if posts.has_prev:
+		prev_url = url_for('explore', page=posts.prev_num)
+
+	return render_template('index.html', title='Explore', posts=posts.items, next_url=next_url, prev_url=prev_url)

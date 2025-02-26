@@ -11,8 +11,8 @@ from urllib.parse import urlsplit
 from datetime import datetime, timezone
 
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm
-from app.models import User
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm
+from app.models import User, Post
 
 import sqlalchemy as sqla
 
@@ -20,27 +20,33 @@ import sqlalchemy as sqla
 # We use decorators to create an association between the URL given as argument and the function
 # When a browser requests either of the two URL '/' or '/index', Flask is goinf to invoke this function
 # and pass its value back to the browser
-@app.route('/')
-@app.route('/index')
+@app.route('/', methods=['GET','POST'])
+@app.route('/index', methods=['GET','POST'])
 @login_required # redirection to the login page if the user try to access this view function
 def index():
-	# list of posts for my blog
-	posts = [
-		{
-			'author': {'username': 'Jackie Chan'},
-			'body': 'Beautiful day in Caen!'
-		},
-		{
-			'author': {'username': 'Bobby Brown'},
-			'body': 'I like trains!'
-		},		
-	]
+	# add post submission form in index view function
+	form = PostForm()
+	if form.validate_on_submit():
+		post = Post(body=form.post.data, author=current_user)
+		db.session.add(post)
+		db.session.commit()
+		flash('Your post is now live!')
+
+		# redirect to index page: if a 'POST' request is answered with a redirect, 
+		# the browser is instructed to send a 'GET' request to grab the page indicated in the redirect,
+		# so now the last request is not a 'POST' request anymore, and the refresh command works in a more predictable way.
+		# (else refresh command will re-issues the last request)
+		# This trick is called Post/Redirect/Get pattern
+		return redirect(url_for('index'))		
+	
+	# display list of followed posts
+	posts = db.session.scalars(current_user.following_posts()).all()
 
 	# The operation that converts a template into a HTML page is called 'rendering'
 	# It is done in Flask using the 'render_template(<filename.html>, <arg>)' function
 	# render_templates invokes Jinja template engine (bundled with Flask)
 	# Jinja substitutes {{ ... }} block with corresponding values provided in the <arg> of the function 
-	return render_template('index.html', title='Home', posts=posts)
+	return render_template('index.html', title='Home', posts=posts, form=form)
 
 # ========== LOG IN/OUT ===========
 #  - loading the page, the browser sends the GET request to receive the web page form

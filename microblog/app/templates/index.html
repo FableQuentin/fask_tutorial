@@ -1,6 +1,7 @@
 <!-- This page inherit from the base template base.html -->
 <!-- {{ placeholder }} is a placeholder for Jinja template engine, i.e a variable known at runtime -->
 {% extends "base.html" %}
+{% import "bootstrap_wtf.html" as wtf %}
 
 {% block content %}
     <h1>Hi, {{ current_user.username }}!</h1>
@@ -26,10 +27,18 @@
     {% endfor %}
 
     <!-- display previous/next page -->
-    {% if prev_url %}
-    <a href="{{ prev_url }}">Newer posts</a>
-    {% endif %}
-    {% if next_url %}
-    <a href="{{ next_url }}">Older posts</a>
-    {% endif %}
+    <nav aria-label="Post navigation">
+        <ul class="pagination">
+            <li class="page-item{% if not prev_url %} disabled{% endif %}">
+                <a class="page-link" href="{{ prev_url }}">
+                    <span aria-hidden="true">&larr;</span> Newer posts
+                </a>
+            </li>
+            <li class="page-item{% if not next_url %} disabled{% endif %}">
+                <a class="page-link" href="{{ next_url }}">
+                    Older posts <span aria-hidden="true">&rarr;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
 {% endblock %}

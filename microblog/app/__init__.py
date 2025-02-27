@@ -3,6 +3,7 @@ from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
+from flask_mail import Mail
 
 import logging
 from logging.handlers import SMTPHandler, RotatingFileHandler
@@ -62,6 +63,10 @@ if not app.debug:
     # First line in log: start/restart of the application
     app.logger.setLevel(logging.INFO)
     app.logger.info('Microblog startup')
+
+# Flask-Email instance
+mail = Mail(app)
+
 
 # ==========================================
 # The bottom import is a well known workaround that avoids circular imports, a common problem with Flask applications. 
